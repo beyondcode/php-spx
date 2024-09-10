@@ -263,26 +263,24 @@ static size_t print_report(fp_reporter_t * reporter, const spx_profiler_event_t 
         sizeof(*reporter->top_entries),
         entry_cmp
     );
-
-    spx_output_stream_print(reporter->output, "\n*** SPX Report ***\n\nGlobal stats:\n\n");
     size_t line_count = 5;
 
-    spx_output_stream_printf(reporter->output, "  %-20s: ", "Called functions");
-    spx_fmt_print_value(
-        reporter->output,
-        SPX_FMT_QUANTITY,
-        event->called
-    );
+    // spx_output_stream_printf(reporter->output, "  %-20s: ", "Called functions");
+    // spx_fmt_print_value(
+    //     reporter->output,
+    //     SPX_FMT_QUANTITY,
+    //     event->called
+    // );
 
-    spx_output_stream_print(reporter->output, "\n");
-    line_count++;
+    // spx_output_stream_print(reporter->output, "\n");
+    // line_count++;
 
-    spx_output_stream_printf(reporter->output, "  %-20s: ", "Distinct functions");
-    spx_fmt_print_value(
-        reporter->output,
-        SPX_FMT_QUANTITY,
-        event->func_table.size
-    );
+    // spx_output_stream_printf(reporter->output, "  %-20s: ", "Distinct functions");
+    // spx_fmt_print_value(
+    //     reporter->output,
+    //     SPX_FMT_QUANTITY,
+    //     event->func_table.size
+    // );
 
     if (event->func_table.size == event->func_table.capacity) {
         spx_output_stream_print(reporter->output, "+");
@@ -295,8 +293,8 @@ static size_t print_report(fp_reporter_t * reporter, const spx_profiler_event_t 
         if (!event->enabled_metrics[i]) {
             continue;
         }
-
-        spx_output_stream_printf(reporter->output, "  %-20s: ", spx_metric_info[i].short_name);
+        continue;
+        spx_output_stream_printf(reporter->output, "  \e[38;5;244m%s:\e[0m ", spx_metric_info[i].short_name);
         spx_fmt_print_value(
             reporter->output,
             spx_metric_info[i].type,
@@ -307,7 +305,7 @@ static size_t print_report(fp_reporter_t * reporter, const spx_profiler_event_t 
         line_count++;
     });
 
-    spx_output_stream_print(reporter->output, "\nFlat profile:\n\n");
+    spx_output_stream_print(reporter->output, "\n");
     line_count += 3;
 
     spx_fmt_row_t * fmt_row = spx_fmt_row_create();

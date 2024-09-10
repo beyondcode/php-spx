@@ -31,11 +31,11 @@ export function makeDataTable(containerId, options, rows) {
 
     let container = $('#' + containerId);
     let render = () => {
-        let html = '<table class="data_table"><thead><tr>';
+        let html = '<table class="data_table text-foreground uk-table uk-table-striped"><thead><tr>';
 
         for (let i = 0; i < options.columns.length; i++) {
             let column = options.columns[i];
-            html += `<th ${i == sort_col ? 'class="data_table-sort"' : ''}>${column.label}</th>`;
+            html += `<th ${i == sort_col ? 'class="data_table-sort p-2"' : ''}>${column.label}</th>`;
         }
 
         html += '</tr></thead><tbody>';
@@ -60,7 +60,7 @@ export function makeDataTable(containerId, options, rows) {
                     value = `<a href="${url}">${value}</a>`;
                 }
 
-                html += `<td class="${column.cssClass || ''}">${value}</td>`;
+                html += `<td class="p-2 text-sm ${column.cssClass || ''}">${value}</td>`;
             }
 
             html += '</tr>';

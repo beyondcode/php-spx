@@ -2,307 +2,450 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>SPX Report</title>
-    <link rel="stylesheet" href="?SPX_UI_URI=/css/main.css">
+    <title>Herd Profiler Report</title>
+    <link rel="stylesheet" href="?SPX_UI_URI=/dist/output.css">
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.20.8/dist/js/uikit.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.20.8/dist/js/uikit-icons.min.js"></script>
+    <script>
+        // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+        if (
+          localStorage.getItem("color-theme") === "dark" ||
+          (!("color-theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+    </script> 
 </head>
-<body>
-    <div id="init-report">
-        <div>
-            <h2>Initializing...</h2>
-            <p></p>
-            <div class="progress">
-                <div style="width: 0%"></div>
-            </div>
-            <p></p>
+<body class="font-geist-sans max-h-screen h-screen bg-background">
+<div id="init-report" class="absolute w-full h-screen flex items-center justify-center bg-background z-20">
+    <div class="rounded-md shadow p-4 bg-white max-w-lg w-full h-64">
+        <h2 class="text-2xl font-medium">Initializing...</h2>
+        <hr class="my-4"/>
+        <p class="font-geist-mono"></p>
+        <div class="progress font-geist-mono">
+            <div class="font-geist-mono" style="width: 0%"></div>
+        </div>
+        <p class="font-geist-mono"></p>
+    </div>
+</div>
+
+<div class="flex flex-col h-full px-2">
+    <div class="-mx-2 relative bg-red-600 text-white">
+        <div id="header" class="mx-auto flex items-center justify-between gap-6 px-6 py-3 sm:py-2">
+            <a href="/?SPX_UI_URI=/index.html"
+               class="inline-flex items-center gap-3 rounded transition hover:text-white/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-red-600">
+                <svg class="h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 440 550">
+                    <path fill="currentColor" d="
+  M 0.00 0.00
+  L 150.06 0.00
+  L 150.02 198.27
+  A 0.57 0.57 0.0 0 0 150.58 198.84
+  C 167.47 199.01 185.36 198.48 201.42 199.56
+  Q 247.43 202.65 289.75 221.46
+  Q 346.73 247.69 385.71 296.75
+  Q 419.64 340.34 432.91 394.00
+  L 437.71 417.50
+  L 437.79 419.50
+  Q 437.83 425.29 439.55 430.80
+  L 440.00 442.31
+  L 440.00 550.00
+  L 290.19 550.00
+  Q 289.89 505.03 289.98 460.07
+  Q 290.01 447.06 289.06 440.12
+  C 282.53 392.50 244.70 355.36 196.96 349.75
+  C 183.01 348.11 165.77 348.98 150.50 349.05
+  A 0.51 0.49 0.0 0 0 149.99 349.54
+  L 149.94 550.00
+  L 0.00 550.00
+  L 0.00 0.00
+  Z"></path>
+                    <path fill="currentColor" fill-opacity="0.718" d="
+  M 291.06 0.00
+  L 440.00 0.00
+  L 440.00 410.56
+  L 439.71 412.50
+  Q 438.01 415.34 438.46 418.75
+  Q 438.21 413.29 437.71 417.50
+  L 432.91 394.00
+  L 434.02 395.06
+  A 1.22 0.57 -76.8 0 1 434.21 395.98
+  C 433.99 397.92 434.99 399.36 435.26 400.92
+  Q 436.36 407.12 437.36 413.33
+  A 0.51 0.39 84.6 0 0 437.75 413.75
+  L 438.26 413.76
+  A 0.82 0.48 -84.6 0 0 438.79 413.02
+  Q 439.08 410.54 439.09 404.81
+  Q 439.19 204.13 439.12 2.95
+  A 1.69 1.69 0.0 0 0 437.43 1.26
+  L 290.03 1.42
+  Q 289.77 0.34 291.06 0.00
+  Z"></path>
+                    <path fill="currentColor" fill-opacity="0.671" d="
+  M 432.91 394.00
+  Q 419.64 340.34 385.71 296.75
+  C 384.61 293.06 380.98 289.81 378.76 287.15
+  C 359.29 263.80 331.94 242.48 303.53 227.45
+  Q 295.45 223.17 290.31 220.80
+  L 290.19 220.62
+  A 0.76 0.65 31.6 0 1 290.06 220.22
+  L 290.03 1.42
+  L 437.43 1.26
+  A 1.69 1.69 0.0 0 1 439.12 2.95
+  Q 439.19 204.13 439.09 404.81
+  Q 439.08 410.54 438.79 413.02
+  A 0.82 0.48 -84.6 0 1 438.26 413.76
+  L 437.75 413.75
+  A 0.51 0.39 84.6 0 1 437.36 413.33
+  Q 436.36 407.12 435.26 400.92
+  C 434.99 399.36 433.99 397.92 434.21 395.98
+  A 1.22 0.57 -76.8 0 0 434.02 395.06
+  L 432.91 394.00
+  Z"></path>
+                    <path fill="currentColor" fill-opacity="0.788" d="
+  M 385.71 296.75
+  Q 346.73 247.69 289.75 221.46
+  L 290.31 220.80
+  Q 295.45 223.17 303.53 227.45
+  C 331.94 242.48 359.29 263.80 378.76 287.15
+  C 380.98 289.81 384.61 293.06 385.71 296.75
+  Z"></path>
+                    <path fill="currentColor" fill-opacity="0.980" d="
+  M 439.71 412.50
+  L 439.55 430.80
+  Q 437.83 425.29 437.79 419.50
+  Q 438.46 421.97 438.46 418.75
+  Q 438.01 415.34 439.71 412.50
+  Z"></path>
+                    <path fill="currentColor" fill-opacity="0.671" d="
+  M 438.46 418.75
+  Q 438.46 421.97 437.79 419.50
+  L 437.71 417.50
+  Q 438.21 413.29 438.46 418.75
+  Z"></path>
+                </svg>
+                <span class="text-[13px]">Laravel Herd Profiler</span>
+            </a>
+
+            <select class="uk-select bg-background w-64" id="report-selector"
+                    onchange="window.location.href = '/?SPX_UI_URI=/report.html&key=' + this.value">
+            >
+            </select>
         </div>
     </div>
-
-    <div style="display: flex; flex-direction: column; height: 100%">
-        <div style="flex: 0 0 24px; display: flex; flex-direction: row;">
-            <div id="metric-selector" class="widget" style="flex: 0 0 120px;">
-                <select></select>
-            </div>
-            <div id="colorscheme-manager" class="widget" style="flex: 0 0 180px;"></div>
-            <div id="category-legend" class="widget"></div>
-            <div id="search-container" class="widget" style="flex: 0 0 195px;">
+    <div class="flex flex-row space-x-2 py-1">
+        <div id="metric-selector" class="widget" style="flex: 0 0 120px;">
+            <select class="uk-select"></select>
+        </div>
+        <div id="category-legend" class="widget"></div>
+        <div id="search-container" class="widget">
+            <div class="uk-inline">
                 <input type="text"
                        id="search_query"
+                       class="uk-input"
                        name="search_query"
                        autocomplete="off"
-                       placeholder="Search by function name">
-                <button id="search_query_button_clear" onclick="$(window).trigger('spx-search-clear')" style="display: none;">
-                    X
-                </button>
+                       placeholder="Function name">
+                <a onclick="$(window).trigger('spx-search-clear')"
+                   id="search_query_button_clear"
+                   style="display: none;"
+                   class="uk-form-icon uk-form-icon-flip" href="#" uk-icon="icon: close">
+                </a>
             </div>
-            <div id="color-scale" class="widget" style="flex: 1 1 150px;"></div>
         </div>
-        <div id="overview" class="widget visualization" style="flex: 0 0 80px"></div>
-        <div style="flex:1; min-height: 0; display: flex; flex-direction: column;">
-            <div id="timeline" class="widget visualization" style="flex: 0 0 auto; height: 300px"></div>
-            <div
-                style="flex: 0 0 3px; width: 100%; background-color: #444; cursor: row-resize;"
+        <div id="color-scale" class="widget rounded-sm overflow-hidden text-gray-900" style="flex: 1 1 150px;"></div>
+    </div>
+    <div id="overview" class="widget visualization rounded-sm overflow-hidden select-none" style="flex: 0 0 80px"></div>
+    <div style="flex:1; min-height: 0; display: flex; flex-direction: column;">
+        <div id="timeline" class="widget visualization select-none cursor-move" style="flex: 0 0 auto; height: 300px"></div>
+        <div
+                class="cursor-row-resize w-full h-px bg-black"
                 data-layout-splitter-target="timeline"
                 data-layout-splitter-axis="y"
                 data-layout-splitter-dir="-1"
                 data-layout-splitter-min="30"
-            ></div>
-            <div style="flex: 1; min-height: 0; display: flex; flex-direction: row;">
-                <div id="flatprofile" class="widget" style="flex: 0 0 auto; width: 900px"></div>
-                <div
-                    style="flex: 0 0 3px; height: 100%; background-color: #444; cursor: col-resize;"
+        ></div>
+        <div style="flex: 1; min-height: 0; display: flex; flex-direction: row;">
+            <div id="flatprofile" class="widget" style="flex: 0 0 auto; width: 900px"></div>
+            <div
+                    class="cursor-col-resize w-px bg-black h-full"
                     data-layout-splitter-target="flatprofile"
                     data-layout-splitter-axis="x"
                     data-layout-splitter-dir="-1"
                     data-layout-splitter-min="500"
-                ></div>
-                <div id="flamegraph" class="widget visualization" style="flex: 1 1 auto"></div>
-            </div>
+            ></div>
+            <div id="flamegraph" class="widget visualization text-background" style="flex: 1 1 auto"></div>
         </div>
     </div>
+</div>
 
-    <!-- Required workaround for Firefox to fix a "no credentials" issue -->
-    <script crossorigin src="?SPX_UI_URI=/js/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="></script>
-    <script crossorigin src="?SPX_UI_URI=/js/jscolor.min.js" integrity="sha256-CJWfUCeP3jLdUMVNUll6yQx37gh9AKmXTRxvRf7jzro="></script>
-    <script type="module" crossorigin src="?SPX_UI_URI=/js/fmt.js"></script>
-    <script type="module" crossorigin src="?SPX_UI_URI=/js/profileData.js"></script>
-    <script type="module" crossorigin src="?SPX_UI_URI=/js/widget.js"></script>
-    <script type="module" crossorigin src="?SPX_UI_URI=/js/layoutSplitter.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"
+></script>
 
-    <script type="module" crossorigin>
-        function getImportUrl(path) {
-            const rootUrl = new URL(import.meta.url);
-            rootUrl.searchParams.set('SPX_UI_URI', path);
-            return rootUrl.toString();
+<script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jscolor/2.0.4/jscolor.min.js"
+        integrity="sha256-CJWfUCeP3jLdUMVNUll6yQx37gh9AKmXTRxvRf7jzro="
+        crossorigin="anonymous"
+></script>
+
+<!-- Required workaround for Firefox to fix a "no credentials" issue -->
+<script type="module" crossorigin src="?SPX_UI_URI=/js/fmt.js"></script>
+<script type="module" crossorigin src="?SPX_UI_URI=/js/profileData.js"></script>
+<script type="module" crossorigin src="?SPX_UI_URI=/js/widget.js"></script>
+<script type="module" crossorigin src="?SPX_UI_URI=/js/layoutSplitter.js"></script>
+
+<script type="module" crossorigin>
+    function getImportUrl(path) {
+        const rootUrl = new URL(import.meta.url);
+        rootUrl.searchParams.set('SPX_UI_URI', path);
+        return rootUrl.toString();
+    }
+
+    const fmt = await import(getImportUrl('/js/fmt.js'));
+    const {ProfileDataBuilder} = await import(getImportUrl('/js/profileData.js'));
+    const widget = await import(getImportUrl('/js/widget.js'));
+    const layoutSplitter = await import(getImportUrl('/js/layoutSplitter.js'));
+
+    $(() => {
+        const m = window.location.href.match(/\bkey=([^&]+)/);
+        if (!m) {
+            return;
         }
 
-        const fmt = await import(getImportUrl('/js/fmt.js'));
-        const {ProfileDataBuilder} = await import(getImportUrl('/js/profileData.js'));
-        const widget = await import(getImportUrl('/js/widget.js'));
-        const layoutSplitter = await import(getImportUrl('/js/layoutSplitter.js'));
+        const key = m[1];
+        let profileDataBuilder = null;
 
-        $(() => {
-            const m = window.location.href.match(/\bkey=([^&]+)/);
-            if (!m) {
+        const initDialog = {
+            container: $('#init-report'),
+            title: document.querySelector('#init-report p:nth-of-type(1)'),
+            progressInfo: document.querySelector('#init-report p:nth-of-type(2)'),
+            progress: document.querySelector('#init-report .progress'),
+            progressBar: document.querySelector('#init-report .progress > div'),
+            data: {}
+        };
+
+        function setProgress(title, current, total) {
+            initDialog.title.innerHTML = title;
+
+            if (!total) {
+                initDialog.progress.style.display = 'none';
+
                 return;
             }
 
-            const key = m[1];
-            let profileDataBuilder = null;
-
-            const initDialog = {
-                container: $('#init-report'),
-                title: document.querySelector('#init-report p:nth-of-type(1)'),
-                progressInfo: document.querySelector('#init-report p:nth-of-type(2)'),
-                progress: document.querySelector('#init-report .progress'),
-                progressBar: document.querySelector('#init-report .progress > div'),
-                data: {}
-            };
-
-            function setProgress(title, current, total) {
-                initDialog.title.innerHTML = title;
-
-                if (!total) {
-                    initDialog.progress.style.display = 'none';
-
-                    return;
-                }
-
-                if (!(title in initDialog.data)) {
-                    initDialog.data[title] = {
-                        startCount: current,
-                        startTime: new Date().getTime() / 1000,
-                    };
-                }
-
-                initDialog.progress.style.display = 'block';
-                initDialog.progressBar.style.width = (
-                    Math.round(100 * current / total) + '%'
-                );
-
-                const currentTime = new Date().getTime() / 1000;
-
-                const rate = (current - initDialog.data[title].startCount) / (currentTime - initDialog.data[title].startTime);
-                const remainingTime = Math.round(
-                    (total - current) / rate
-                );
-
-                initDialog.progressInfo.innerText = (
-                    `${fmt.pct(current / total)} (${fmt.quantity(current)}, ${fmt.quantity(rate)}/s) ETA: ${remainingTime}s`
-                );
+            if (!(title in initDialog.data)) {
+                initDialog.data[title] = {
+                    startCount: current,
+                    startTime: new Date().getTime() / 1000,
+                };
             }
 
-            fetch('?SPX_UI_URI=/data/metrics', {credentials: "same-origin"})
-                .then(response => response.json())
-                .then(response => {
-                    profileDataBuilder = new ProfileDataBuilder(response.results);
+            initDialog.progress.style.display = 'block';
+            initDialog.progressBar.style.width = (
+                Math.round(100 * current / total) + '%'
+            );
 
-                    return fetch('?SPX_UI_URI=/data/reports/metadata/' + key, {credentials: "same-origin"});
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Cannot load report metadata');
+            const currentTime = new Date().getTime() / 1000;
+
+            const rate = (current - initDialog.data[title].startCount) / (currentTime - initDialog.data[title].startTime);
+            const remainingTime = Math.round(
+                (total - current) / rate
+            );
+
+            initDialog.progressInfo.innerText = (
+                `${fmt.pct(current / total)} (${fmt.quantity(current)}, ${fmt.quantity(rate)}/s) ETA: ${remainingTime}s`
+            );
+        }
+
+        fetch('?SPX_UI_URI=/data/reports/metadata', {credentials: "same-origin"})
+            .then(response => response.json())
+            .then(response => {
+                response.results = response.results.filter(result => result.http_host == document.location.host)
+                response.results.forEach(report => {
+                    $('#report-selector').append(
+                        `<option value="${report.key}" ${report.key === decodeURIComponent(key) ? 'selected' : ''} >${report.http_method} ${report.http_request_uri} ${report.http_host}</option>`
+                    );
+                });
+        });
+
+        fetch('?SPX_UI_URI=/data/metrics', {credentials: "same-origin"})
+            .then(response => response.json())
+            .then(response => {
+                profileDataBuilder = new ProfileDataBuilder(response.results);
+
+                return fetch('?SPX_UI_URI=/data/reports/metadata/' + key, {credentials: "same-origin"});
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cannot load report metadata');
+                }
+
+                return response.json();
+            })
+            .then(metadata => {
+                profileDataBuilder.setMetadata(metadata);
+
+                return fetch('?SPX_UI_URI=/data/reports/get/' + key, {credentials: "same-origin"});
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cannot load report');
+                }
+
+                let type = null;
+                let currentFunctionIdx = 0;
+                let lastTruncatedLine = '';
+
+                const decoder = new TextDecoder('ascii');
+
+                function readBuffer(buffer) {
+                    if (buffer.length == 0) {
+                        return;
                     }
 
-                    return response.json();
-                })
-                .then(metadata => {
-                    profileDataBuilder.setMetadata(metadata);
+                    const lines = decoder.decode(buffer).split("\n");
+                    lines[0] = lastTruncatedLine + lines[0];
+                    lastTruncatedLine = lines.pop();
 
-                    return fetch('?SPX_UI_URI=/data/reports/get/' + key, {credentials: "same-origin"});
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Cannot load report');
+                    for (const line of lines) {
+                        if (line == '[events]') {
+                            type = 'event';
+
+                            continue;
+                        }
+
+                        if (line == '[functions]') {
+                            type = 'function';
+
+                            continue;
+                        }
+
+                        if (type == 'event') {
+                            profileDataBuilder.addEvent(
+                                line.split(' ').map(e => parseFloat(e))
+                            );
+
+                            continue;
+                        }
+
+                        if (type == 'function') {
+                            profileDataBuilder.setFunctionName(
+                                currentFunctionIdx++,
+                                line
+                            );
+
+                            continue;
+                        }
                     }
 
-                    let type = null;
-                    let currentFunctionIdx = 0;
-                    let lastTruncatedLine = '';
+                    setProgress(
+                        'Building call list... (1/2)<br>'
+                        + `${fmt.quantity(profileDataBuilder.getTotalCallCount())} function calls`
+                        ,
+                        profileDataBuilder.getCurrentCallCount(),
+                        profileDataBuilder.getTotalCallCount()
+                    );
+                }
 
-                    const decoder = new TextDecoder('ascii');
+                if (!response.body) {
+                    return response.arrayBuffer().then(buffer => {
+                        const blockSize = 256 * 1024;
+                        const readBlocks = (offset, resolve) => {
+                            if (buffer.byteLength - offset <= blockSize) {
+                                readBuffer(new Uint8Array(buffer, offset));
 
-                    function readBuffer(buffer) {
-                        if (buffer.length == 0) {
+                                return new Promise(() => resolve());
+                            }
+
+                            readBuffer(new Uint8Array(buffer, offset, blockSize));
+
+                            setTimeout(() => readBlocks(offset + blockSize, resolve), 0);
+                        }
+
+                        return new Promise(resolve => {
+                            setTimeout(() => readBlocks(0, resolve), 0);
+                        });
+                    });
+                }
+
+                const reader = response.body.getReader();
+                const streamHandler = status => {
+                    if (status.value) {
+                        readBuffer(status.value);
+                    }
+
+                    if (!status.done) {
+                        return reader.read().then(streamHandler);
+                    }
+
+                    return new Promise(resolve => resolve());
+                }
+
+                return reader.read().then(streamHandler);
+            })
+            .then(() => profileDataBuilder.buildCallRangeTree(
+                (current, total) => setProgress(
+                    `Building call range tree... (2/2)<br>${fmt.quantity(total)} function calls`,
+                    current,
+                    total
+                )
+            ))
+            .then(() => {
+                initDialog.title.innerText = 'Initializing widgets...';
+
+                return new Promise(resolve => resolve(profileDataBuilder.getProfileData()));
+            })
+            .then(profileData => {
+                const metricSelector = $('#metric-selector select');
+                for (const metric of profileData.getMetadata().enabled_metrics) {
+                    metricSelector.append(
+                        `<option value="${metric}">${profileData.getMetricInfo(metric).name}</option>`
+                    );
+                }
+
+                const widgets = [
+                    new widget.ColorScale($('#color-scale'), profileData),
+                    new widget.CategoryLegend($('#category-legend'), profileData),
+                    new widget.ColorSchemeManager($('#colorscheme-manager'), profileData),
+                    new widget.OverView($('#overview'), profileData),
+                    new widget.TimeLine($('#timeline'), profileData),
+                    new widget.FlatProfile($('#flatprofile'), profileData),
+                    new widget.FlameGraph($('#flamegraph'), profileData),
+                ];
+
+                widgets.forEach(widget => widget.render());
+
+                metricSelector.on('change', () => {
+                    widgets.forEach(widget => widget.setCurrentMetric(metricSelector.val()));
+                    widgets.forEach(widget => widget.repaint());
+                });
+
+                layoutSplitter.init();
+                layoutSplitter.change(() => {
+                    widgets.forEach(widget => {
+                        if (!["timeline", "flatprofile", "flamegraph"].includes(widget.container.attr("id"))) {
                             return;
                         }
 
-                        const lines = decoder.decode(buffer).split("\n");
-                        lines[0] = lastTruncatedLine + lines[0];
-                        lastTruncatedLine = lines.pop();
-
-                        for (const line of lines) {
-                            if (line == '[events]') {
-                                type = 'event';
-
-                                continue;
-                            }
-
-                            if (line == '[functions]') {
-                                type = 'function';
-
-                                continue;
-                            }
-
-                            if (type == 'event') {
-                                profileDataBuilder.addEvent(
-                                    line.split(' ').map(e => parseFloat(e))
-                                );
-
-                                continue;
-                            }
-
-                            if (type == 'function') {
-                                profileDataBuilder.setFunctionName(
-                                    currentFunctionIdx++,
-                                    line
-                                );
-
-                                continue;
-                            }
-                        }
-
-                        setProgress(
-                            'Building call list... (1/2)<br>'
-                                + `${fmt.quantity(profileDataBuilder.getTotalCallCount())} function calls`
-                            ,
-                            profileDataBuilder.getCurrentCallCount(),
-                            profileDataBuilder.getTotalCallCount()
-                        );
-                    }
-
-                    if (!response.body) {
-                        return response.arrayBuffer().then(buffer => {
-                            const blockSize = 256 * 1024;
-                            const readBlocks = (offset, resolve) => {
-                                if (buffer.byteLength - offset <= blockSize) {
-                                    readBuffer(new Uint8Array(buffer, offset));
-
-                                    return new Promise(() => resolve());
-                                }
-
-                                readBuffer(new Uint8Array(buffer, offset, blockSize));
-
-                                setTimeout(() => readBlocks(offset + blockSize, resolve), 0);
-                            }
-
-                            return new Promise(resolve => {
-                                setTimeout(() => readBlocks(0, resolve), 0);
-                            });
-                        });
-                    }
-
-                    const reader = response.body.getReader();
-                    const streamHandler = status => {
-                        if (status.value) {
-                            readBuffer(status.value);
-                        }
-
-                        if (!status.done) {
-                            return reader.read().then(streamHandler);
-                        }
-
-                        return new Promise(resolve => resolve());
-                    }
-
-                    return reader.read().then(streamHandler);
-                })
-                .then(() => profileDataBuilder.buildCallRangeTree(
-                    (current, total) => setProgress(
-                        `Building call range tree... (2/2)<br>${fmt.quantity(total)} function calls`,
-                        current,
-                        total
-                    )
-                ))
-                .then(() => {
-                    initDialog.title.innerText = 'Initializing widgets...';
-
-                    return new Promise(resolve => resolve(profileDataBuilder.getProfileData()));
-                })
-                .then(profileData => {
-                    const metricSelector = $('#metric-selector select');
-                    for (const metric of profileData.getMetadata().enabled_metrics) {
-                        metricSelector.append(
-                            `<option value="${metric}">${profileData.getMetricInfo(metric).name}</option>`
-                        );
-                    }
-
-                    const widgets = [
-                        new widget.ColorScale($('#color-scale'), profileData),
-                        new widget.CategoryLegend($('#category-legend'), profileData),
-                        new widget.ColorSchemeManager($('#colorscheme-manager'), profileData),
-                        new widget.OverView($('#overview'), profileData),
-                        new widget.TimeLine($('#timeline'), profileData),
-                        new widget.FlatProfile($('#flatprofile'), profileData),
-                        new widget.FlameGraph($('#flamegraph'), profileData),
-                    ];
-
-                    widgets.forEach(widget => widget.render());
-
-                    metricSelector.on('change', () => {
-                        widgets.forEach(widget => widget.setCurrentMetric(metricSelector.val()));
-                        widgets.forEach(widget => widget.repaint());
+                        widget.handleResize();
                     });
+                });
 
-                    layoutSplitter.init();
-                    layoutSplitter.change(() => {
-                        widgets.forEach(widget => {
-                            if (!["timeline", "flatprofile", "flamegraph"].includes(widget.container.attr("id"))) {
-                                return;
-                            }
-
-                            widget.handleResize();
-                        });
-                    });
-
-                    return new Promise(resolve => resolve());
-                })
-                .then(() => initDialog.container.fadeOut(500))
-                .catch(e => {
-                    initDialog.progressInfo.innerText = e;
-                    console.error(e)
-                })
-            ;
-        });
-    </script>
+                return new Promise(resolve => resolve());
+            })
+            .then(() => initDialog.container.fadeOut(500))
+            .catch(e => {
+                initDialog.progressInfo.innerText = e;
+                console.error(e)
+            })
+        ;
+    });
+</script>
 </body>
 </html>

@@ -19,58 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#ifdef ZTS
-#   include <pthread.h>
-#endif
-
 #include "spx_utils.h"
-
-char * spx_utils_resolve_confined_file_absolute_path(
-    const char * root_dir,
-    const char * relative_path,
-    const char * suffix,
-    char * dst,
-    size_t size
-) {
-    if (size < PATH_MAX) {
-        spx_utils_die("size < PATH_MAX");
-    }
-
-    char absolute_file_path[PATH_MAX];
-
-    snprintf(
-        absolute_file_path,
-        sizeof(absolute_file_path),
-        "%s%s%s",
-        root_dir,
-        relative_path,
-        suffix == NULL ? "" : suffix
-    );
-
-    if (realpath(absolute_file_path, dst) == NULL) {
-        return NULL;
-    }
-
-    char root_dir_real_path[PATH_MAX];
-    if (realpath(root_dir, root_dir_real_path) == NULL) {
-        return NULL;
-    }
-
-    char expected_path_prefix[PATH_MAX + 1];
-    snprintf(
-        expected_path_prefix,
-        sizeof(expected_path_prefix),
-        "%s/",
-        root_dir_real_path
-    );
-
-    if (! spx_utils_str_starts_with(dst, expected_path_prefix)) {
-        return NULL;
-    }
-
-    return dst;
-}
 
 char * spx_utils_json_escape(char * dst, const char * src, size_t limit)
 {
@@ -167,13 +116,13 @@ int spx_utils_str_ends_with(const char * str, const char * suffix)
     return 0;
 }
 
+#ifdef ZTS
+/* We just cannot kill other threads */
+#   error "Fair error handling is required for ZTS"
+#endif
 void spx_utils_die_(const char * msg, const char * file, size_t line)
 {
     fprintf(stderr, "SPX Fatal error at %s:%lu - %s\n", file, line, msg);
 
-#ifdef ZTS
-    pthread_exit(NULL);
-#else
     exit(EXIT_FAILURE);
-#endif
 }

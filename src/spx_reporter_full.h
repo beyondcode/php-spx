@@ -26,14 +26,14 @@ size_t spx_reporter_full_metadata_list_files(
     void (*callback) (const char *, size_t)
 );
 
-char * spx_reporter_full_build_metadata_file_name(
+int spx_reporter_full_build_metadata_file_name(
     const char * data_dir,
     const char * key,
     char * file_name,
     size_t size
 );
 
-char * spx_reporter_full_build_file_name(
+int spx_reporter_full_build_file_name(
     const char * data_dir,
     const char * key,
     char * file_name,

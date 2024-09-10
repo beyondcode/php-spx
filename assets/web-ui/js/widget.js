@@ -155,6 +155,7 @@ function renderSVGMultiLineText(viewPort, lines) {
         fill: '#fff',
     });
 
+    text.classList.add('font-geist-mono')
     viewPort.appendChild(text);
 
     for (let line of lines) {
@@ -486,7 +487,7 @@ class Widget {
 
         $(document).on('focus keyup', '#search_query', (e) => {
             if (this.searchQuery) {
-                $('#search_query_button_clear').css('display', 'inline-block');
+                $('#search_query_button_clear').css('display', 'inline-flex');
             }
         });
 
@@ -575,14 +576,19 @@ class Widget {
                 this.repaintTimeout = null;
 
                 const id = this.container.attr('id');
-                console.time('repaint ' + id);
-                console.time('clear ' + id);
+                // Remember the scroll position
+                let scroll = 0;
+                if (id === 'flatprofile') {
+                    scroll = $(`#flatprofile div`).scrollTop();
+                }
                 this.clear();
-                console.timeEnd('clear ' + id);
-                console.time('render ' + id);
                 this.render();
-                console.timeEnd('render ' + id);
-                console.timeEnd('repaint ' + id);
+                // Restore the scroll position
+                if (id === 'flatprofile') {
+                    $(`#flatprofile div`).scrollTop(scroll);
+                } else {
+                    $(`#${id}`).scrollTop(scroll);
+                }
             },
             0
         );
@@ -1088,8 +1094,8 @@ export class OverView extends SVGWidget {
             height: this.viewPort.height,
             stroke: new math.Vec3(0, 0.7, 0).toHTMLColor(),
             'stroke-width': 2,
-            fill: new math.Vec3(0, 1, 0).toHTMLColor(),
-            'fill-opacity': '0.1',
+            'fill': new math.Vec3(0, 1, 0).toHTMLColor(),
+            'fill-opacity': '0.05',
         });
 
         this.viewPort.appendChildToFragment(this.timeRangeRect);
@@ -1528,7 +1534,7 @@ export class FlameGraph extends SVGWidget {
             y: 0,
             width: this.viewPort.width,
             height: this.viewPort.height,
-            'fill-opacity': '0.1',
+            fill: 'currentColor',
         }));
 
         if (this.profileData.isReleasableMetric(this.currentMetric)) {
@@ -1656,8 +1662,8 @@ export class FlatProfile extends Widget {
     render() {
 
         let html = `
-<table width="${this.container.width() - 20}px">
-<thead>
+<table class="uk-table" width="${this.container.width() - 20}px">
+<thead class="text-muted-foreground">
     <tr>
         <th rowspan="3" class="sortable" data-sort="name">Function</th>
         <th rowspan="3" width="80px" class="sortable" data-sort="called">Called</th>
@@ -1678,8 +1684,8 @@ export class FlatProfile extends Widget {
         `;
 
         html += `
-<div style="overflow-y: auto; height: ${this.container.height() - 60}px">
-<table width="${this.container.width() - 20}px"><tbody>
+<div style="overflow-y: auto; height: ${this.container.height() - 80}px">
+<table class="uk-table uk-table-divider" width="${this.container.width() - 20}px"><tbody>
         `;
 
         const functionsStats = this
@@ -1785,11 +1791,11 @@ export class FlatProfile extends Widget {
     >
         ${utils.truncateFunctionName(functionLabel, (this.container.width() - 5 * 90) / 8)}
     </td>
-    <td width="80px">${fmt.quantity(stats.called)}</td>
-    <td width="80px">${fmt.pct(incRel)}${renderRelativeCostBar(incRel)}</td>
-    <td width="80px">${fmt.pct(excRel)}${renderRelativeCostBar(excRel)}</td>
-    <td width="80px">${formatter(inc)}</td>
-    <td width="80px">${formatter(exc)}</td>
+    <td width="80px" class="${stats.functionName !== this.highlightedFunctionName && this.highlightedFunctionName !== null ? 'text-muted-foreground' : 'text-foreground'}">${fmt.quantity(stats.called)}</td>
+    <td width="80px" class="${stats.functionName !== this.highlightedFunctionName && this.highlightedFunctionName !== null ? 'text-muted-foreground' : 'text-foreground'}">${fmt.pct(incRel)}${renderRelativeCostBar(incRel)}</td>
+    <td width="80px" class="${stats.functionName !== this.highlightedFunctionName && this.highlightedFunctionName !== null ? 'text-muted-foreground' : 'text-foreground'}">${fmt.pct(excRel)}${renderRelativeCostBar(excRel)}</td>
+    <td width="80px" class="${stats.functionName !== this.highlightedFunctionName && this.highlightedFunctionName !== null ? 'text-muted-foreground' : 'text-foreground'}">${formatter(inc)}</td>
+    <td width="80px" class="${stats.functionName !== this.highlightedFunctionName && this.highlightedFunctionName !== null ? 'text-muted-foreground' : 'text-foreground'}">${formatter(exc)}</td>
 </tr>
             `;
         }
@@ -1815,6 +1821,8 @@ export class FlatProfile extends Widget {
         });
 
         this.container.find('tbody td').click(e => {
+            e.preventDefault()
+
             const functionName = $(e.target).data('function-name');
 
             $(window).trigger(

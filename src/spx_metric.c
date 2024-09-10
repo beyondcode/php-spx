@@ -76,7 +76,7 @@ const spx_metric_info_t spx_metric_info[SPX_METRIC_COUNT] = {
     },
     ARRAY_INIT_INDEX(SPX_METRIC_ZE_MEMORY_USAGE) {
         "zm",
-        "ZE memory usage",
+        "Memory usage",
         "Zend Engine memory usage",
         SPX_FMT_MEMORY,
         1,

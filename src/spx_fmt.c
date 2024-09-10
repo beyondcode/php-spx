@@ -121,7 +121,7 @@ void spx_fmt_row_add_tcell(
     }
 
     row->cells[row->cell_count].span = span;
-    row->cells[row->cell_count].ansi_fmt = NULL;
+    row->cells[row->cell_count].ansi_fmt = "38;5;244";
     row->cells[row->cell_count].num = 0;
     row->cells[row->cell_count].text = text;
 
@@ -179,7 +179,15 @@ void spx_fmt_row_print(const spx_fmt_row_t * row, spx_output_stream_t * output)
         }
 
         if (row->cells[i].span == 0) {
+            if (row->cells[i].ansi_fmt) {
+                spx_output_stream_printf(output, "\e[%sm", row->cells[i].ansi_fmt);
+            }
+
             spx_output_stream_print(output, text);
+
+            if (row->cells[i].ansi_fmt) {
+                spx_output_stream_print(output, "\e[0m");
+            }
 
             break;
         }
@@ -207,7 +215,7 @@ void spx_fmt_row_print(const spx_fmt_row_t * row, spx_output_stream_t * output)
             spx_output_stream_print(output, "\e[0m");
         }
 
-        spx_output_stream_print(output, " |");
+        spx_output_stream_print(output, " \033[1;30m│\033[0m");
     }
 
     spx_output_stream_print(output, "\n");
@@ -218,14 +226,14 @@ void spx_fmt_row_print_sep(const spx_fmt_row_t * row, spx_output_stream_t * outp
     size_t i;
     for (i = 0; i < row->cell_count; i++) {
         if (row->cells[i].span == 0) {
-            spx_output_stream_print(output, "----------");
+            spx_output_stream_print(output, "\033[1;30m──────────\033[0m");
 
             break;
         }
 
         size_t j;
         for (j = 0; j < row->cells[i].span; j++) {
-            spx_output_stream_print(output, "----------+");
+            spx_output_stream_print(output, "\033[1;30m──────────┼\033[0m");
         }
     }
 
