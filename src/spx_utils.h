@@ -50,6 +50,14 @@ do {                                                              \
     }                                                             \
 } while (0)
 
+char * spx_utils_resolve_confined_file_absolute_path(
+    const char * root_dir,
+    const char * relative_path,
+    const char * suffix,
+    char * dst,
+    size_t size
+);
+
 char * spx_utils_json_escape(char * dst, const char * src, size_t limit);
 int spx_utils_str_starts_with(const char * str, const char * prefix);
 int spx_utils_str_ends_with(const char * str, const char * suffix);
