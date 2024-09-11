@@ -67,7 +67,7 @@ typedef struct {
 typedef struct {
     spx_profiler_reporter_t base;
 
-    char metadata_file_name[PATH_MAX];
+    char metadata_file_name[512];
     metadata_t * metadata;
     spx_output_stream_t * output;
 
@@ -99,7 +99,7 @@ size_t spx_reporter_full_metadata_list_files(
         return 0;
     }
 
-    char file_path[PATH_MAX];
+    char file_path[512];
     size_t count = 0;
     const struct dirent * entry;
     while ((entry = readdir(dir)) != NULL) {
@@ -124,33 +124,33 @@ size_t spx_reporter_full_metadata_list_files(
     return count;
 }
 
-char * spx_reporter_full_build_metadata_file_name(
+int spx_reporter_full_build_metadata_file_name(
     const char * data_dir,
     const char * key,
     char * file_name,
     size_t size
 ) {
-    return spx_utils_resolve_confined_file_absolute_path(
-        data_dir,
-        key,
-        ".json",
+    return snprintf(
         file_name,
-        size
+        size,
+        "%s/%s.json",
+        data_dir,
+        key
     );
 }
 
-char * spx_reporter_full_build_file_name(
+int spx_reporter_full_build_file_name(
     const char * data_dir,
     const char * key,
     char * file_name,
     size_t size
 ) {
-    return spx_utils_resolve_confined_file_absolute_path(
-        data_dir,
-        key,
-        ".txt.gz",
+    return snprintf(
         file_name,
-        size
+        size,
+        "%s/%s.txt.gz",
+        data_dir,
+        key
     );
 }
 
@@ -173,21 +173,19 @@ spx_profiler_reporter_t * spx_reporter_full_create(const char * data_dir)
         goto error;
     }
 
-    char file_name[PATH_MAX];
-    snprintf(
-        file_name,
-        sizeof(file_name),
-        "%s/%s.txt.gz",
+    char file_name[512];
+    spx_reporter_full_build_file_name(
         data_dir,
-        reporter->metadata->key
+        reporter->metadata->key,
+        file_name,
+        sizeof(file_name)
     );
 
-    snprintf(
-        reporter->metadata_file_name,
-        sizeof(reporter->metadata_file_name),
-        "%s/%s.json",
+    spx_reporter_full_build_metadata_file_name(
         data_dir,
-        reporter->metadata->key
+        reporter->metadata->key,
+        reporter->metadata_file_name,
+        sizeof(reporter->metadata_file_name)
     );
 
     (void) mkdir(data_dir, 0777);

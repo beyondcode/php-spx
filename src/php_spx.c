@@ -924,29 +924,20 @@ static void http_ui_handler_shutdown(void)
         ui_uri = "/index.html";
     }
 
-    if (ui_uri[0] != '/') {
-        goto error_404;
-    }
-
     if (0 == http_ui_handler_data(SPX_G(data_dir), ui_uri)) {
         goto finish;
     }
 
-    char local_file_absolute_path[PATH_MAX];
+    char local_file_name[512];
+    snprintf(
+        local_file_name,
+        sizeof(local_file_name),
+        "%s%s",
+        SPX_G(http_ui_assets_dir),
+        ui_uri
+    );
 
-    if (
-        spx_utils_resolve_confined_file_absolute_path(
-            SPX_G(http_ui_assets_dir),
-            ui_uri,
-            NULL,
-            local_file_absolute_path,
-            sizeof(local_file_absolute_path)
-        ) == NULL
-    ) {
-        goto error_404;
-    }
-
-    if (0 == http_ui_handler_output_file(local_file_absolute_path)) {
+    if (0 == http_ui_handler_output_file(local_file_name)) {
         goto finish;
     }
 
@@ -1034,34 +1025,26 @@ static int http_ui_handler_data(const char * data_dir, const char *relative_path
 
     const char * get_report_metadata_uri = "/data/reports/metadata/";
     if (spx_utils_str_starts_with(relative_path, get_report_metadata_uri)) {
-        char file_name[PATH_MAX];
-        if (
-            spx_reporter_full_build_metadata_file_name(
-                data_dir,
-                relative_path + strlen(get_report_metadata_uri) - 1,
-                file_name,
-                sizeof(file_name)
-            ) == NULL
-        ) {
-            return -1;
-        }
+        char file_name[512];
+        spx_reporter_full_build_metadata_file_name(
+            data_dir,
+            relative_path + strlen(get_report_metadata_uri),
+            file_name,
+            sizeof(file_name)
+        );
 
         return http_ui_handler_output_file(file_name);
     }
 
     const char * get_report_uri = "/data/reports/get/";
     if (spx_utils_str_starts_with(relative_path, get_report_uri)) {
-        char file_name[PATH_MAX];
-        if (
-            spx_reporter_full_build_file_name(
-                data_dir,
-                relative_path + strlen(get_report_uri) - 1,
-                file_name,
-                sizeof(file_name)
-            ) == NULL
-        ) {
-            return -1;
-        }
+        char file_name[512];
+        spx_reporter_full_build_file_name(
+            data_dir,
+            relative_path + strlen(get_report_uri),
+            file_name,
+            sizeof(file_name)
+        );
 
         return http_ui_handler_output_file(file_name);
     }
