@@ -21,20 +21,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [ '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3' ]
+        php: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
 
         name:
-          - linux
-          - debian
-          - mac
+          - mac-x64
+          - mac-arm64
 
         include:
-          # Linux
-          - { name: linux,  ts: 'nts', compiler: 'gcc',   os: ubuntu-20.04 }
-          # Debian (docker)
-          - { name: debian, ts: 'nts', compiler: 'gcc',   os: ubuntu-20.04 }
-          # macOS
-          - { name: mac,    ts: 'nts', compiler: 'clang', os: macos-12 }
+          - { name: mac-x64,    ts: 'nts', compiler: 'clang', os: macos-latest-large }
+          - { name: mac-arm64,    ts: 'nts', compiler: 'clang', os: macos-latest-xlarge }
 
     steps:
       - uses: actions/checkout@v3
@@ -47,13 +42,8 @@ jobs:
         run: |
           echo "spx_file_name=spx-php-${{ matrix.php }}-${{ matrix.ts }}-${{ matrix.name }}-${{ matrix.compiler }}" >> $GITHUB_OUTPUT
 
-      - name: Build extension for Ubuntu and macOS
-        if: matrix.name != 'debian'
+      - name: Build extension for macOS
         uses: ./.github/workflows/build-linux-mac-ext
-
-      - name: Build extension for Debian using docker
-        if: matrix.name == 'debian' && matrix.php != '5.4' && matrix.php != '5.5'
-        uses: ./.github/workflows/build-debian-ext
 
       - name: Upload build artifacts after Failure
         if: failure()
@@ -105,7 +95,7 @@ jobs:
 
       - name: Download SPX build artifacts
         id: download
-        uses: actions/download-artifact@v4.1.7
+        uses: actions/download-artifact@v3
         with:
           path: ./build-artifacts
 
