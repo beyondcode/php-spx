@@ -93,7 +93,7 @@ fi
 
 if [[ $HERD_INSTALLED -eq 1 ]]; then
     info "Laravel Herd is installed. Installing for all available PHP versions..."
-    for version in {74..84}; do
+    for version in {74..83}; do
         PHP_BIN="$HERD_BIN_DIR/php$version"
         CONFIG_DIR="$HERD_CONFIG_DIR/$version"
         if [[ -f $PHP_BIN ]]; then
