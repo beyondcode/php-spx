@@ -20,6 +20,7 @@
 #define SPX_UTILS_H_DEFINED
 
 #include <stddef.h>
+#include <limits.h> /* PATH_MAX */
 
 #define SPX_UTILS_TOKENIZE_STRING(str, delim, token, size, block) \
 do {                                                              \
