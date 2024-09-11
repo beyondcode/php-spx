@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-REPO_URL="https://api.github.com/repos/beyondcode/herd-spx-extension/releases/latest"
+REPO_URL="https://api.github.com/repos/beyondcode/php-spx/releases/latest"
 HERD_INSTALLED=0
 HERD_BIN_DIR="$HOME/Library/Application Support/Herd/bin"
 HERD_CONFIG_DIR="$HOME/Library/Application Support/Herd/config/php"
@@ -59,16 +59,16 @@ download_and_extract() {
     local version=$1
     local php_version=$2
     local target_dir=$HERD_CONFIG_DIR/$version
-    local file_url="https://github.com/beyondcode/herd-spx-extension/releases/download/$LATEST_RELEASE/spx-php-$php_version-nts-mac-$ARCH-clang.zip"
+    local file_url="https://github.com/beyondcode/php-spx/releases/download/$LATEST_RELEASE/spx-php-$php_version-nts-mac-$ARCH-clang.zip"
     local zip_file="spx-php-$php_version.zip"
     local so_file="spx.so"
 
     info "Downloading $zip_file..."
 
-    #curl -L -o "$target_dir/$zip_file" $file_url
+    curl -L -o "$target_dir/$zip_file" $file_url
     
     info "Extracting $zip_file..."
-    # unzip -o "$target_dir/$zip_file" -d "$target_dir/spx" > /dev/null
+    unzip -o "$target_dir/$zip_file" -d "$target_dir/spx" > /dev/null
 
     # Make sure the .so file exists
     if [[ ! -f "$target_dir/spx/$so_file" ]]; then
@@ -80,7 +80,7 @@ download_and_extract() {
     # Remove the quarantine attribute (might not be needed when the repo is public)
     # sudo xattr -r -d com.apple.quarantine "$target_dir/spx/$so_file"
 
-    # rm "$target_dir/$zip_file"
+    rm "$target_dir/$zip_file"
 }
 
 info "Installing the SPX Profiler extension..."
