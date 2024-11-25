@@ -23,6 +23,12 @@ if test "$PHP_SPX" = "yes"; then
         CFLAGS="$CFLAGS -DCONTINUOUS_INTEGRATION"
     fi
 
+    if test "$(uname -s 2>/dev/null)" = "Darwin"
+    then
+        # see discussion here https://github.com/NoiseByNorthwest/php-spx/pull/270
+        CFLAGS="$CFLAGS -Wno-typedef-redefinition"
+    fi
+
     if test "$PHP_SPX_DEV" = "yes"
     then
         CFLAGS="$CFLAGS -g"

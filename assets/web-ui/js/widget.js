@@ -573,21 +573,17 @@ class Widget {
 
         this.repaintTimeout = setTimeout(
             () => {
+                let initialScrollPos = 0;
                 this.repaintTimeout = null;
 
                 const id = this.container.attr('id');
-                // Remember the scroll position
-                let scroll = 0;
                 if (id === 'flatprofile') {
-                    scroll = $(`#flatprofile div`).scrollTop();
+                    initialScrollPos = document.querySelector('#flatprofile > div').scrollTop;
                 }
                 this.clear();
                 this.render();
-                // Restore the scroll position
                 if (id === 'flatprofile') {
-                    $(`#flatprofile div`).scrollTop(scroll);
-                } else {
-                    $(`#${id}`).scrollTop(scroll);
+                    document.querySelector('#flatprofile > div').scrollTop = initialScrollPos;
                 }
             },
             0
