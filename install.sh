@@ -48,7 +48,7 @@ error() {
 }
 
 # Fetch the latest release tag from GitHub API
-LATEST_RELEASE=$(curl -s $REPO_URL | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+LATEST_RELEASE=$(curl -s $REPO_URL | grep -o '"tag_name": *"[^"]*"' | sed 's/.*": *"\([^"]*\)".*/\1/')
 
 echo ""
 info "Latest release: $LATEST_RELEASE"
