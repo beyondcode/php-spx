@@ -51,6 +51,12 @@ error() {
 LATEST_RELEASE=$(curl -s $REPO_URL | grep -o '"tag_name": *"[^"]*"' | sed 's/.*": *"\([^"]*\)".*/\1/')
 
 echo ""
+
+if [[ -z $LATEST_RELEASE ]]; then
+    error "Could not determine the latest SPX release."
+    exit 1
+fi
+
 info "Latest release: $LATEST_RELEASE"
 
 
@@ -65,8 +71,11 @@ download_and_extract() {
 
     info "Downloading $zip_file..."
 
-    curl -L -o "$target_dir/$zip_file" $file_url
-    
+    if ! curl -fsL -o "$target_dir/$zip_file" "$file_url"; then
+        rm -f "$target_dir/$zip_file"
+        return 1
+    fi
+
     info "Extracting $zip_file..."
     unzip -o "$target_dir/$zip_file" -d "$target_dir/spx" > /dev/null
 
@@ -74,7 +83,8 @@ download_and_extract() {
     if [[ ! -f "$target_dir/spx/$so_file" ]]; then
         echo "There was an error extracting the extension."
         echo "$so_file not found in $target_dir/spx"
-        exit 1
+        rm -f "$target_dir/$zip_file"
+        return 1
     fi
 
     # Remove the quarantine attribute (might not be needed when the repo is public)
@@ -93,8 +103,11 @@ fi
 
 if [[ $HERD_INSTALLED -eq 1 ]]; then
     info "Laravel Herd is installed. Installing for all available PHP versions..."
-    for version in {74..84}; do
-        PHP_BIN="$HERD_BIN_DIR/php$version"
+    INSTALLED=()
+    UNSUPPORTED=()
+
+    for PHP_BIN in "$HERD_BIN_DIR"/php[0-9][0-9]; do
+        version=${PHP_BIN##*/php}
         CONFIG_DIR="$HERD_CONFIG_DIR/$version"
         if [[ -f $PHP_BIN ]]; then
             PHP_VERSION_STRING="${version:0:1}.${version:1}"
@@ -106,9 +119,12 @@ if [[ $HERD_INSTALLED -eq 1 ]]; then
             # Check if the extension is already in php.ini
             if ! grep -q "extension=$SO_FILE" "$PHP_INI_PATH"; then
                 info "Installing for PHP $PHP_VERSION_STRING..."
-                
+
                 # Download and extract the .so file
-                _=$(download_and_extract $version $PHP_VERSION_STRING)
+                if ! download_and_extract $version $PHP_VERSION_STRING > /dev/null; then
+                    UNSUPPORTED+=("$PHP_VERSION_STRING")
+                    continue
+                fi
 
                 {
                     echo ""
@@ -127,11 +143,23 @@ if [[ $HERD_INSTALLED -eq 1 ]]; then
                     info "Skipping, already installed…"
                 fi
             fi
+
+            INSTALLED+=("$PHP_VERSION_STRING")
         fi
     done
 
+    if [[ ${#UNSUPPORTED[@]} -gt 0 ]]; then
+        info "No SPX build for PHP ${UNSUPPORTED[*]} yet, skipped."
+    fi
+
+    if [[ ${#INSTALLED[@]} -eq 0 ]]; then
+        error "There was an error installing the extension."
+        error "No supported PHP version found."
+        exit 1
+    fi
+
     info "Restarting Laravel Herd..."
-    
+
     if [[ $VERBOSE -eq 1 ]]; then
         herd restart
     else
@@ -139,14 +167,20 @@ if [[ $HERD_INSTALLED -eq 1 ]]; then
     fi
 
     # Validate the installation
-    SPX_INSTALLED=$(php -m | grep SPX)
-    if [[ -z $SPX_INSTALLED ]]; then
-        error "There was an error installing the extension."
+    FAILED=()
+    for PHP_VERSION_STRING in "${INSTALLED[@]}"; do
+        if ! "$HERD_BIN_DIR/php${PHP_VERSION_STRING/./}" -m | grep -q SPX; then
+            FAILED+=("$PHP_VERSION_STRING")
+        fi
+    done
+
+    if [[ ${#FAILED[@]} -gt 0 ]]; then
+        error "There was an error installing the extension for PHP ${FAILED[*]}."
         error "Please check the output above for any errors."
         exit 1
     fi
 
-    success "SPX Profiler extension installed successfully."
+    success "SPX Profiler installed for PHP ${INSTALLED[*]}."
 else
     error "Laravel Herd is not installed. Exiting..."
     error "Please follow the manual installation instructions on the GitHub repository."
